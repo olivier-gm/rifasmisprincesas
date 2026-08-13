@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/static/img/ico.png" type="image/x-icon">
+    <title>Verificar Tickets</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000000f5;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            width: 300px;
+        }
+
+        .container h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333333;
+        }
+
+        .container input[type="number"] {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #cccccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .container button {
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .container button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <form id="enviar" action="/" method="GET" onsubmit="redirectToCedula(event)">
+        <div class="container">
+            <h1>Verificar Tickets</h1>
+            <input type="number" id="verify" name="verify" placeholder="Introduzca su número de cédula" required>
+            <button type="submit">Buscar</button>
+        </div>
+    </form>
+
+    <script>
+        function redirectToCedula(event) {
+            event.preventDefault(); // Evita el envío del formulario por defecto
+
+            // Obtener el valor del input
+            const cedula = document.getElementById("verify").value;
+
+            // Validar que el valor no esté vacío
+            if (!cedula) {
+                alert("Por favor, introduzca un número de cédula válido.");
+                return;
+            }
+
+            // Redirigir a la URL con la cédula
+            window.location.href = `/2/${cedula}`;
+        }
+    </script>
+</body>
+</html>

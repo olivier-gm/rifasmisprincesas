@@ -1,0 +1,13 @@
+.carton-box {
+    width: 100%; /* Asegura que ocupe el 100% de su contenedor */
+    max-width: 120px; /* Tamaño máximo para limitar el ancho */
+    height: 140px; /* Altura fija para que sean cuadrados */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto; /* Centra horizontalmente dentro de la columna */
+}
+.texto{
+    font-size: 10px;
+}
+

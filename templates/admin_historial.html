@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Admin · Historial Rifas</title>
+  <style>
+    body{ font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background:#0f172a; color:#e2e8f0; margin:0; display:grid; place-items:center; min-height:100vh; }
+    .card{ background:#111827; border:1px solid #1f2937; border-radius:14px; padding:24px; width:min(520px, 92vw); box-shadow:0 10px 30px rgba(0,0,0,.35);}
+    h1{ margin:0 0 16px; font-size:20px; }
+    .row{ display:flex; align-items:center; justify-content:space-between; padding:14px 0; border-bottom:1px solid #1f2937; }
+    .row:last-child{ border-bottom:0; }
+    .desc{ opacity:.9; font-size:14px; margin-top:4px;}
+    .group{ display:flex; flex-direction:column; gap:4px; }
+    .actions{ display:flex; gap:10px; margin-top:18px; }
+    .btn{ background:#2563eb; color:#fff; border:none; padding:10px 14px; border-radius:10px; font-weight:600; cursor:pointer; }
+    .btn:disabled{ opacity:.6; cursor:default; }
+    .msg{ margin-top:10px; color:#34d399; font-weight:600; }
+    /* Switch */
+    .switch{ position:relative; width:54px; height:30px; }
+    .switch input{ opacity:0; width:0; height:0; }
+    .slider{
+      position:absolute; cursor:pointer; inset:0; background:#374151; transition:.25s; border-radius:999px;
+    }
+    .slider:before{
+      content:""; position:absolute; height:24px; width:24px; left:3px; top:3px; background:white; border-radius:999px; transition:.25s;
+      box-shadow:0 2px 6px rgba(0,0,0,.35);
+    }
+    input:checked + .slider{ background:#10b981; }
+    input:checked + .slider:before{ transform:translateX(24px); }
+    small{ opacity:.7; }
+  </style>
+</head>
+<body>
+  <form class="card" method="POST">
+    <h1>Historial de Rifas</h1>
+
+    <div class="row">
+      <div class="group">
+        <strong>Mostrar historial de la rifa 2</strong>
+        <span class="desc">Activa/desactiva la visualización del historial y tarjetas asociadas a rifa2.</span>
+      </div>
+      <label class="switch" title="Rifa2">
+        <input type="checkbox" name="rifa2" {% if datos.mostrar_rifa2 %}checked{% endif %}>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="row">
+      <div class="group">
+        <strong>Mostrar historial de la rifa 3</strong>
+        <span class="desc">Activa/desactiva la visualización del historial y tarjetas asociadas a rifa3.</span>
+      </div>
+      <label class="switch" title="Rifa3">
+        <input type="checkbox" name="rifa3" {% if datos.mostrar_rifa3 %}checked{% endif %}>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="actions">
+      <button class="btn" type="submit">Guardar cambios</button>
+    </div>
+
+    {% if ok %}
+      <div class="msg">Cambios guardados.</div>
+    {% endif %}
+  </form>
+</body>
+</html>

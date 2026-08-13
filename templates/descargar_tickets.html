@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/static/img/ico.png" type="image/x-icon">
+    <title>Gracias por tu compra</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000000f5;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        img {
+            max-width: 40%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 5px;
+        }
+        h1 {
+            color: #007BFF;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            background: #02d53a;
+            color: white;
+            margin: 5px;
+            padding: 10px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="{{ url_for('static', filename='img/partida.jpg') }}" alt="Gracias por participar">
+        <h1>¡Bienvenido a 'Rifas Mis princesas'!, {{ nombre }}!</h1>
+        <p>Estos son los tickets que compraste:</p>
+        <ul>
+            {% for ticket in tickets %}
+                <li>{{ "%04d"|format(ticket|int) }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
