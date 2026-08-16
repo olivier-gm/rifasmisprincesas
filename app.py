@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash, send_from_directory
+from config import DATA_DIR, UPLOAD_DIR, IMG_DIR, CONFIG_DB_PATH, RIFA_DB_PATH, RIFA2_DB_PATH, RIFA3_DB_PATH
 from crud import set_acepta_dolares, get_acepta_dolares, obtener_datos_historial, obtener_comprador_por_cedula2, obtener_comprador_por_cedula3, get_enunciado2, get_enunciado3, get_porcentaje2, get_porcentaje3, get_premio2, get_premio3, obtener_comprador_por_cedula, get_tickets, get_porcentaje, tickets_disponibles,reintegrar_tickets,get_data, get_data2, actualizar_partida,obtener_datos_partida, get_enunciado, get_premio, insertar_comprador, get_estatus, get_precio, vendidos, get_minima, get_dolar, get_zelle
 import os
 from werkzeug.utils import secure_filename
@@ -30,8 +31,7 @@ def login_required(f):
     return decorated_function
 
 app = Flask(__name__)
-UPLOAD_FOLDER = 'static/comprobantes'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['UPLOAD_FOLDER'] = UPLOAD_DIR
 app.config['SECRET_KEY'] = 'supersecretkey'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
@@ -71,7 +71,7 @@ def _tickets_faltantes(tickets):
         return []
 
     placeholders = ','.join(['?'] * len(tickets))
-    with sqlite3.connect('rifa.db') as conn:
+    with sqlite3.connect(RIFA_DB_PATH) as conn:
         cursor = conn.cursor()
         cursor.execute(
             f"SELECT carton_disponible FROM tickets_disponibles WHERE carton_disponible IN ({placeholders})",
@@ -88,7 +88,7 @@ def _reservar_tickets_dev(tickets):
         raise ValueError("Debes enviar al menos un ticket.")
 
     placeholders = ','.join(['?'] * len(tickets))
-    with sqlite3.connect('rifa.db') as conn:
+    with sqlite3.connect(RIFA_DB_PATH) as conn:
         cursor = conn.cursor()
         conn.execute("BEGIN TRANSACTION;")
         cursor.execute(
@@ -115,7 +115,7 @@ def insertar_compra_dev(
     tickets,
     monto=None,
     referencia="dev_manual",
-    referencia_ruta="/static/comprobantes/dev_manual.jpg",
+    referencia_ruta="/comprobantes/dev_manual.jpg",
 ):
     """Inserta una compra directa para desarrollo, con tickets definidos manualmente.
     No requiere 'digitos'. El campo 'estatus' queda en NULL (como una compra normal).
@@ -135,7 +135,7 @@ def insertar_compra_dev(
         except Exception:
             monto = "0bs"
 
-    with sqlite3.connect('rifa.db') as conn:
+    with sqlite3.connect(RIFA_DB_PATH) as conn:
         cursor = conn.cursor()
         cursor.execute(
             """
@@ -191,7 +191,7 @@ def run_dev_cli():
     )
     insert_parser.add_argument(
         "--referencia-ruta",
-        default="/static/comprobantes/dev_manual.jpg",
+        default="/comprobantes/dev_manual.jpg",
         help="Ruta pública de comprobante",
     )
 
@@ -292,7 +292,7 @@ def registrar():
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             nmr_r.save(filepath)
 
-            referencia_ruta = os.path.join('/static/comprobantes', filename).replace("\\", "/")
+            referencia_ruta = os.path.join('/comprobantes', filename).replace("\\", "/")
             fecha = get_enunciado()
 
         # Recuperar los datos de la compra (los valores pasados en los campos ocultos)
@@ -321,7 +321,7 @@ def registrar():
 @login_required  # Ruta protegida por login
 def reiniciar():
 
-    conn = sqlite3.connect('rifa.db')
+    conn = sqlite3.connect(RIFA_DB_PATH)
     cursor = conn.cursor()
 
     cursor.execute("""DELETE FROM tickets_disponibles WHERE 1 = 1""")
@@ -337,8 +337,8 @@ def reiniciar():
 
     conn.close()
 
-        # Eliminar todos los archivos en /static/comprobantes/
-    folder_path = 'static/comprobantes/'
+        # Eliminar todos los archivos en la carpeta de comprobantes
+    folder_path = UPLOAD_DIR
     for filename in os.listdir(folder_path):
         file_path = os.path.join(folder_path, filename)
         if os.path.isfile(file_path):  # Verificar si es un archivo
@@ -382,9 +382,8 @@ def desplazar():
             pass
 
     # Directorios base
-    app_root = Path(current_app.root_path)
-    db_dir = app_root  # Ajusta si las DBs viven en otro lado (e.g., current_app.instance_path)
-    img_dir = Path(current_app.static_folder) / "img"
+    db_dir = Path(DATA_DIR)
+    img_dir = Path(IMG_DIR)
 
     # Rutas de DB
     rifa = db_dir / "rifa.db"
@@ -571,7 +570,7 @@ def admin_dashboard_partida():
 
     if request.method == "POST":
         scnd_price = request.form.get("scnd_price")
-        with sqlite3.connect("rifa.db") as conn:
+        with sqlite3.connect(RIFA_DB_PATH) as conn:
             cursor = conn.cursor()
             cursor.execute('''
             CREATE TABLE IF NOT EXISTS scnd_price
@@ -584,7 +583,7 @@ def admin_dashboard_partida():
             cursor.execute('''UPDATE scnd_price SET precio = ?''', (scnd_price,))
             conn.commit()
 
-        UPLOAD_FOLDER_PARTIDA = "static/img"
+        UPLOAD_FOLDER_PARTIDA = IMG_DIR
 
         if "imagen" in request.files:
             file = request.files["imagen"]
@@ -644,7 +643,7 @@ def aprobar():
     if not solicitud_id:
         return jsonify({"success": False, "message": "Falta el id de la solicitud"}), 400
 
-    conn = sqlite3.connect('rifa.db')
+    conn = sqlite3.connect(RIFA_DB_PATH)
     cursor = conn.cursor()
 
     try:
@@ -674,7 +673,7 @@ def invalidate():
     solicitud_id = data.get("id")
 
     # Conectar a la base de datos
-    conn = sqlite3.connect('rifa.db')
+    conn = sqlite3.connect(RIFA_DB_PATH)
     cursor = conn.cursor()
 
     try:
@@ -723,7 +722,7 @@ def message():
     solicitud_id = data.get("id")
 
     # Conectar a la base de datos
-    conn = sqlite3.connect('rifa.db')
+    conn = sqlite3.connect(RIFA_DB_PATH)
     cursor = conn.cursor()
 
     # Verificar si la solicitud existe
@@ -754,7 +753,7 @@ import re
 @app.route("/admin/dashboard/vendidos")
 @login_required  # Ruta protegida por login
 def mostrar_cartones():
-    with sqlite3.connect("rifa.db") as conn:
+    with sqlite3.connect(RIFA_DB_PATH) as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT tickets_vendidos FROM requeridos;")
         cartones_tuplas = cursor.fetchall()
@@ -802,6 +801,15 @@ def mostrar_cartones():
 
         return render_template("disponibles_no.html", tickets=tickets, montos_totales=montos_totales)
 
+
+
+@app.route('/comprobantes/<path:filename>')
+def comprobantes(filename):
+    return send_from_directory(UPLOAD_DIR, filename)
+
+@app.route('/img-data/<path:filename>')
+def img_data(filename):
+    return send_from_directory(IMG_DIR, filename)
 
 
 if __name__ == '__main__':
