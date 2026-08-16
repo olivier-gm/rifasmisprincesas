@@ -1,7 +1,8 @@
 import sqlite3
+from config import RIFA_DB_PATH
 
 # Crear conexión a la base de datos SQLite3
-conn = sqlite3.connect("rifa.db")
+conn = sqlite3.connect(RIFA_DB_PATH)
 cursor = conn.cursor()
 
 # Tabla "venta" (solo permite una fila)

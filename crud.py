@@ -2,11 +2,12 @@ import sqlite3
 import json
 import time
 from flask import request, render_template, redirect, url_for
+from config import CONFIG_DB_PATH, RIFA_DB_PATH, RIFA2_DB_PATH, RIFA3_DB_PATH
 
-DB_NAME = "rifa.db"
+DB_NAME = RIFA_DB_PATH
 # --- Persistencia ---
 def _ensure_flags_table():
-    conn = sqlite3.connect('config.db')
+    conn = sqlite3.connect(CONFIG_DB_PATH)
     c = conn.cursor()
     c.execute("""
         CREATE TABLE IF NOT EXISTS feature_flags (
@@ -25,7 +26,7 @@ def get_acepta_dolares() -> bool:
     BD: 0 = acepta, 1 = NO acepta  -> invertimos al retornar.
     """
     _ensure_flags_table()
-    conn = sqlite3.connect('config.db')
+    conn = sqlite3.connect(CONFIG_DB_PATH)
     c = conn.cursor()
     c.execute("SELECT value FROM feature_flags WHERE key='acepta_dolares'")
     row = c.fetchone()
@@ -39,7 +40,7 @@ def set_acepta_dolares(enabled: bool) -> None:
     enabled False (OFF) => guarda 1 (NO acepta)
     """
     _ensure_flags_table()
-    conn = sqlite3.connect('config.db')
+    conn = sqlite3.connect(CONFIG_DB_PATH)
     c = conn.cursor()
     value = 0 if enabled else 1
     c.execute("UPDATE feature_flags SET value=? WHERE key='acepta_dolares'", (value,))
@@ -60,7 +61,7 @@ def execute_query(query, params=(), fetch=False, fetchone=False):
 
 def obtener_datos_partida():
     # Conectar a la base de datos
-    conn = sqlite3.connect('rifa.db')
+    conn = sqlite3.connect(RIFA_DB_PATH)
     cursor = conn.cursor()
 
     # Crear la consulta para obtener el dato específico
@@ -89,7 +90,7 @@ def actualizar_partida(fecha_enunciado=None, recompensa=None, precio_carton=None
     import sqlite3
 
     # Conectar a la base de datos
-    conn = sqlite3.connect('rifa.db')
+    conn = sqlite3.connect(RIFA_DB_PATH)
     cursor = conn.cursor()
 
     # Verificar si la tabla tiene al menos una fila
@@ -253,7 +254,7 @@ def tickets_usados(C=None, read=None, U=None, D=None):
 def get_data2():
     import sqlite3
 
-    conn = sqlite3.connect('rifa.db')
+    conn = sqlite3.connect(RIFA_DB_PATH)
     cursor = conn.cursor()
 
     # >>> Cambiado: ahora solo trae requeridos aprobados <<<
@@ -301,7 +302,7 @@ def get_data2():
     return solicitudes
 
 def get_data():
-    conn = sqlite3.connect('rifa.db')
+    conn = sqlite3.connect(RIFA_DB_PATH)
     cursor = conn.cursor()
 
     # Consulta todos los datos de la tabla
@@ -337,7 +338,7 @@ def get_data():
     return solicitudes
 
 def get_enunciado3():
-    conn = sqlite3.connect('rifa3.db')
+    conn = sqlite3.connect(RIFA3_DB_PATH)
     cursor = conn.cursor()
 
     cursor.execute("SELECT estatus FROM venta WHERE id = 1")
@@ -358,7 +359,7 @@ def get_enunciado3():
 
 
 def get_enunciado2():
-    conn = sqlite3.connect('rifa2.db')
+    conn = sqlite3.connect(RIFA2_DB_PATH)
     cursor = conn.cursor()
 
     cursor.execute("SELECT estatus FROM venta WHERE id = 1")
@@ -380,7 +381,7 @@ def get_enunciado2():
 
 
 def get_enunciado():
-    conn = sqlite3.connect('rifa.db')
+    conn = sqlite3.connect(RIFA_DB_PATH)
     cursor = conn.cursor()
 
     cursor.execute("SELECT estatus FROM venta WHERE id = 1")
@@ -402,7 +403,7 @@ def get_enunciado():
 
 
 def get_premio3():
-    conn = sqlite3.connect('rifa3.db')
+    conn = sqlite3.connect(RIFA3_DB_PATH)
     cursor = conn.cursor()
     cursor.execute("SELECT recompensa FROM venta")
     data = cursor.fetchone()  # Recupera todos los datos de la tabla
@@ -411,7 +412,7 @@ def get_premio3():
 
 
 def get_premio2():
-    conn = sqlite3.connect('rifa2.db')
+    conn = sqlite3.connect(RIFA2_DB_PATH)
     cursor = conn.cursor()
     cursor.execute("SELECT recompensa FROM venta")
     data = cursor.fetchone()  # Recupera todos los datos de la tabla
@@ -420,7 +421,7 @@ def get_premio2():
 
 
 def get_premio():
-    conn = sqlite3.connect('rifa.db')
+    conn = sqlite3.connect(RIFA_DB_PATH)
     cursor = conn.cursor()
     cursor.execute("SELECT recompensa FROM venta")
     data = cursor.fetchone()  # Recupera todos los datos de la tabla
@@ -428,7 +429,7 @@ def get_premio():
     return data[0] if data else None
 
 def get_precio():
-    conn = sqlite3.connect('rifa.db')
+    conn = sqlite3.connect(RIFA_DB_PATH)
     cursor = conn.cursor()
     cursor.execute("SELECT precio_de_ticket FROM venta")
     data = cursor.fetchone()  # Recupera todos los datos de la tabla
@@ -447,7 +448,7 @@ def insertar_comprador(nombre_apellido, cedula, telefono, referencia, tickets_ve
     while attempt < max_retries:
         try:
             # Conectar a la base de datos
-            conn = sqlite3.connect('rifa.db')
+            conn = sqlite3.connect(RIFA_DB_PATH)
             cursor = conn.cursor()
 
             # Iniciar la transacción explícitamente
@@ -475,7 +476,7 @@ def insertar_comprador(nombre_apellido, cedula, telefono, referencia, tickets_ve
                 else:
                     # Si se superan los intentos, retornar un mensaje
                     print("insercion invalida")
-                    conn = sqlite3.connect('rifa.db')
+                    conn = sqlite3.connect(RIFA_DB_PATH)
                     cursor = conn.cursor()
 
             # Ejecutar el comando para eliminar los cartones de la tabla `tickets_disponibles`
@@ -520,16 +521,13 @@ def insertar_comprador(nombre_apellido, cedula, telefono, referencia, tickets_ve
 
 
 
-import sqlite3
-
-
 def obtener_comprador_por_cedula3(cedula):
     """
     Recupera el nombre y los tickets vendidos de la base de datos usando la cédula.
     Si hay múltiples coincidencias, conserva el primer nombre encontrado y combina los tickets.
     Retorna un diccionario con los datos estructurados.
     """
-    with sqlite3.connect("rifa3.db") as conn:
+    with sqlite3.connect(RIFA3_DB_PATH) as conn:
         cursor = conn.cursor()
         cursor.execute('''
         SELECT nombre_apellidos, tickets_vendidos
@@ -568,7 +566,7 @@ def obtener_comprador_por_cedula2(cedula):
     Si hay múltiples coincidencias, conserva el primer nombre encontrado y combina los tickets.
     Retorna un diccionario con los datos estructurados.
     """
-    with sqlite3.connect("rifa2.db") as conn:
+    with sqlite3.connect(RIFA2_DB_PATH) as conn:
         cursor = conn.cursor()
         cursor.execute('''
         SELECT nombre_apellidos, tickets_vendidos
@@ -607,7 +605,7 @@ def obtener_comprador_por_cedula(cedula):
     Si hay múltiples coincidencias, conserva el primer nombre encontrado y combina los tickets.
     Retorna un diccionario con los datos estructurados.
     """
-    with sqlite3.connect("rifa.db") as conn:
+    with sqlite3.connect(RIFA_DB_PATH) as conn:
         cursor = conn.cursor()
         cursor.execute('''
         SELECT nombre_apellidos, tickets_vendidos
@@ -639,16 +637,13 @@ def obtener_comprador_por_cedula(cedula):
         "tickets": tickets_vendidos
     }
 
-from flask import request, render_template, redirect, url_for
-
-
 # --- Persistencia de flags (crear/leer/actualizar) ---
 def obtener_datos_historial():
     """
     Lee (y si es POST, actualiza) los flags que controlan mostrar/ocultar
     rifa2 y rifa3. Devuelve un dict con enteros 0/1.
     """
-    conn = sqlite3.connect('config.db')
+    conn = sqlite3.connect(CONFIG_DB_PATH)
     c = conn.cursor()
     c.execute("""
         CREATE TABLE IF NOT EXISTS feature_flags (
@@ -681,7 +676,7 @@ def obtener_datos_historial():
 def get_tickets(cant_tickets):
     try:
         # Conectar a la base de datos
-        conn = sqlite3.connect('rifa.db')  # Cambia 'database_name.db' por el nombre de tu base de datos
+        conn = sqlite3.connect(RIFA_DB_PATH)  # Cambia 'database_name.db' por el nombre de tu base de datos
         cursor = conn.cursor()
 
         # Consultar la cantidad total de columnas disponibles
@@ -714,7 +709,7 @@ tickets_obtenidos = get_tickets(5)
 print(tickets_obtenidos) #[50, 51, 52, 53, 54]
 
 def get_porcentaje3(flag):
-    conn = sqlite3.connect('rifa3.db')
+    conn = sqlite3.connect(RIFA3_DB_PATH)
     cursor = conn.cursor()
     cursor.execute("SELECT COUNT(carton_disponible) FROM tickets_disponibles")
     cantidad = cursor.fetchone()[0]
@@ -728,7 +723,7 @@ def get_porcentaje3(flag):
 
 
 def get_porcentaje2(flag):
-    conn = sqlite3.connect('rifa2.db')
+    conn = sqlite3.connect(RIFA2_DB_PATH)
     cursor = conn.cursor()
     cursor.execute("SELECT COUNT(carton_disponible) FROM tickets_disponibles")
     cantidad = cursor.fetchone()[0]
@@ -744,7 +739,7 @@ def get_porcentaje2(flag):
 
 
 def get_porcentaje(flag):
-    conn = sqlite3.connect('rifa.db')
+    conn = sqlite3.connect(RIFA_DB_PATH)
     cursor = conn.cursor()
     cursor.execute("SELECT COUNT(carton_disponible) FROM tickets_disponibles")
     cantidad = cursor.fetchone()[0]
@@ -760,7 +755,7 @@ def get_porcentaje(flag):
 
 
 def get_estatus():
-    conn = sqlite3.connect('rifa.db')
+    conn = sqlite3.connect(RIFA_DB_PATH)
     cursor = conn.cursor()
     cursor.execute("SELECT estatus FROM venta WHERE id = 1")
     estatus = cursor.fetchone()[0]
@@ -768,7 +763,7 @@ def get_estatus():
     return estatus if estatus else None
 
 def get_minima():
-    conn = sqlite3.connect('rifa.db')
+    conn = sqlite3.connect(RIFA_DB_PATH)
     cursor = conn.cursor()
     cursor.execute("SELECT minima_ticket_regalo FROM venta WHERE id = 1")
     modalidad = cursor.fetchone()[0]
@@ -777,7 +772,7 @@ def get_minima():
 
 def vendidos(cartones):
     # Conectar a la base de datos
-    conn = sqlite3.connect('rifa.db')
+    conn = sqlite3.connect(RIFA_DB_PATH)
     cursor = conn.cursor()
 
     # Convertir los valores del array en tuplas (executemany espera una lista de tuplas)
@@ -799,7 +794,7 @@ def vendidos(cartones):
         conn.close()
 
 def get_dolar():
-    conn = sqlite3.connect('rifa.db')
+    conn = sqlite3.connect(RIFA_DB_PATH)
     cursor = conn.cursor()
     cursor.execute("SELECT precio_dolar FROM venta WHERE id = 1")
     dolar = cursor.fetchone()[0]
@@ -807,7 +802,7 @@ def get_dolar():
     return dolar if dolar else None
 
 def get_zelle():
-    conn = sqlite3.connect('rifa.db')
+    conn = sqlite3.connect(RIFA_DB_PATH)
     cursor = conn.cursor()
     cursor.execute("SELECT zelle FROM venta WHERE id = 1")
     zelle = cursor.fetchone()[0]
@@ -818,7 +813,7 @@ def get_zelle():
 
 def reintegrar_tickets(cartones):
     # Conectar a la base de datos
-    conn = sqlite3.connect('rifa.db')
+    conn = sqlite3.connect(RIFA_DB_PATH)
     cursor = conn.cursor()
 
     # Convertir los valores del array en tuplas (executemany espera una lista de tuplas)

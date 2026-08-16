@@ -308,7 +308,7 @@
     <div class="slider" id="slider">
       <!-- Principal (funciones 1) -->
       <div class="card" aria-label="Rifa principal">
-        <img src="{{ url_for('static', filename='img/partida.jpg') }}" alt="Imagen rifa 1" draggable="false">
+        <img src="{{ url_for('serve_img', filename='partida.jpg') }}" alt="Imagen rifa 1" draggable="false">
         <div class="THIS">{{ premio }}</div>
 <button class="buy" id="buy-button-1" onclick="buyTickets()">COMPRAR TICKETS 🎫</button>
 <button class="verify" onclick="verifyTicket()">Verificar Ticket 🎫</button>
@@ -325,7 +325,7 @@
       <!-- Secundaria (funciones 2) -->
        {% if mostrar_rifa2 %}
       <div class="card" aria-label="Rifa 2">
-        <img src="{{ url_for('static', filename='img/partida2.jpg') }}" alt="Imagen rifa 2" draggable="false">
+        <img src="{{ url_for('serve_img', filename='partida2.jpg') }}" alt="Imagen rifa 2" draggable="false">
         <div class="THIS">{{ premio2 }}</div>
         <button class="verify" onclick="verifyTicket2()">Verificar Ticket 🎫</button>
         <div class="info">
@@ -343,7 +343,7 @@
 
         {% if mostrar_rifa3 %}
       <div class="card" aria-label="Rifa 3">
-        <img src="{{ url_for('static', filename='img/partida3.jpg') }}" alt="Imagen rifa 3" draggable="false">
+        <img src="{{ url_for('serve_img', filename='partida3.jpg') }}" alt="Imagen rifa 3" draggable="false">
         <div class="THIS">{{ premio3 }}</div>
         <button class="verify" onclick="verifyTicket3()">Verificar Ticket 🎫</button>
         <div class="info">
