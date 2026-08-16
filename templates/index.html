@@ -1,437 +1,317 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="shortcut icon" href="/static/img/icon.png" />
+  <link rel="shortcut icon" href="/static/img/icon.png"/>
   <title>Rifas mis Princesas</title>
   <style>
-    :root {
-      --card-w: 300px;
-      --gap: 16px;
+    :root{ --card-w:300px; --gap:16px; }
+    body{
+      font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin:0; background:#000000f5; color:#fff;
+      display:flex; flex-direction:column; align-items:center; min-height:100vh;
     }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      background: #000000f5;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-    }
-
-    .logo {
-      width: 10vw;
-      margin: 18px 0 8px;
-    }
-
-    @media (max-width:600px) {
-      .logo {
-        width: 30vw;
-        margin: 7px 0 2px;
-      }
-    }
+    .logo{ width:10vw; margin:18px 0 8px; }
+    @media (max-width:600px){ .logo{ width:30vw; margin:7px 0 2px; } }
 
     /* --- Carrusel --- */
-    .slider-wrapper {
-      width: 100%;
-      max-width: calc(var(--card-w)*3 + var(--gap)*4);
-      padding: 8px var(--gap) 16px;
+    .slider-wrapper{
+      width:100%;
+      max-width:calc(var(--card-w)*3 + var(--gap)*4);
+      padding:8px var(--gap) 16px;
     }
-
-    .slider {
-      display: flex;
-      gap: var(--gap);
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      scroll-behavior: smooth;
-      /* suaviza los scrollTo de snap */
-      -webkit-overflow-scrolling: touch;
-      /* suaviza en iOS */
-      cursor: grab;
-      padding-bottom: 8px;
-      perspective: 1200px;
+    .slider{
+      display:flex; gap:var(--gap);
+      overflow-x:auto;
+      scroll-snap-type:x mandatory;
+      scroll-behavior:smooth;            /* suaviza los scrollTo de snap */
+      -webkit-overflow-scrolling:touch;  /* suaviza en iOS */
+      cursor:grab; padding-bottom:8px;
+      perspective:1200px;
     }
-
-    .slider::before {
-      /* Centra la PRIMERA tarjeta */
-      content: "";
-      flex: 0 0 calc((100% - var(--card-w))/2);
+    .slider::before{ /* Centra la PRIMERA tarjeta */
+      content:""; flex:0 0 calc((100% - var(--card-w))/2);
     }
+    .slider:active{ cursor:grabbing; }
+    .slider::-webkit-scrollbar{ height:0; } /* oculta scrollbar horizontal */
 
-    .slider:active {
-      cursor: grabbing;
+    .card{
+      background:#f3f3f3e6; color:#000; border-radius:10px;
+      box-shadow:0 12px 24px rgba(0,0,0,.35);
+      width:var(--card-w); min-width:var(--card-w);
+      overflow:hidden; text-align:center; margin-bottom:8px;
+      scroll-snap-align:center; scroll-snap-stop:always;
+      user-select:none; will-change:transform;
+      transform:rotateY(0deg) scale(1);
+      transform-origin:center center;
+      transition:transform .35s ease, box-shadow .35s ease;
     }
-
-    .slider::-webkit-scrollbar {
-      height: 0;
-    }
-
-    /* oculta scrollbar horizontal */
-
-    .card {
-      background: #f3f3f3e6;
-      color: #000;
-      border-radius: 10px;
-      box-shadow: 0 12px 24px rgba(0, 0, 0, .35);
-      width: var(--card-w);
-      min-width: var(--card-w);
-      overflow: hidden;
-      text-align: center;
-      margin-bottom: 8px;
-      scroll-snap-align: center;
-      scroll-snap-stop: always;
-      user-select: none;
-      will-change: transform;
-      transform: rotateY(0deg) scale(1);
-      transform-origin: center center;
-      transition: transform .35s ease, box-shadow .35s ease;
-    }
-
     /* ►► Las imágenes ya no se pueden arrastrar ni “capturar” el mouse */
-    .card img {
-      width: 100%;
-      display: block;
-      -webkit-user-drag: none;
-      user-select: none;
-      pointer-events: none;
+    .card img{
+      width:100%; display:block;
+      -webkit-user-drag:none; user-select:none; pointer-events:none;
     }
 
-    .card button {
-      width: 80%;
-      padding: 12px;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background-color .3s;
+    .card button{
+      width:80%; padding:12px; font-size:15px; font-weight:bold;
+      cursor:pointer; transition:background-color .3s;
+    }
+  .buy {
+    background: rgb(202, 0, 20); /* Rojo Bootstrap */
+    color: #fff;
+    padding: 15px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    margin-bottom: 3%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.4);
+  }
+  .buy:hover {
+    background: rgb(200, 35, 51);
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(200, 35, 51, 0.5);
+  }
+    .THIS{ margin:13px 0; font-weight:500; }
+
+    .info{ display:flex; justify-content:space-between; align-items:center; padding:10px; }
+    .info .date{
+      background:#242525; color:white; padding:5px 10px; border-radius:5px;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:48%;
+    }
+    .progress-container{
+      background:#d32f2f; border-radius:5px; overflow:hidden;
+      height:32px; width:47%; position:relative;
+    }
+    .progress-bar{
+      background:#4caf50; height:100%; width:0; transition:width .5s ease;
+      display:flex; align-items:center; justify-content:flex-start; position:relative;
+    }
+    .progress-text{
+      position:absolute; width:100%; color:#000; font-size:13.8px;
+      text-align:end; pointer-events:none; display:flex; font-weight:bold; padding-left:.3rem;
     }
 
-    .buy {
-      background: rgb(202, 0, 20);
-      /* Rojo Bootstrap */
-      color: #fff;
-      padding: 15px 20px;
-      font-size: 18px;
-      font-weight: bold;
-      border: none;
-      border-radius: 12px;
-      margin-bottom: 3%;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 8px rgba(220, 53, 69, 0.4);
-    }
+  .verify {
+    background: rgb(202, 0, 20); /* Rojo Bootstrap */
+    color: #fff;
+    padding: 15px;
+    font-size: 17px;
+    font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    width: var(--card-w);
+    margin-bottom: 8px;
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.4);
+  }
+  .verify:hover {
+    background: rgb(200, 35, 51);
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(200, 35, 51, 0.5);
+  }
 
-    .buy:hover {
-      background: rgb(200, 35, 51);
-      transform: scale(1.05);
-      box-shadow: 0 6px 12px rgba(200, 35, 51, 0.5);
-    }
+/* Contenedor principal para posicionamiento fijo */
+.whatsapp-container {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 1000; /* Asegura que esté por encima de otros elementos */
+}
 
-    .THIS {
-      margin: 13px 0;
-      font-weight: 500;
-    }
+/* Estilo para el ícono (tu estilo original) */
+.whatsapp-icon {
+    background: #25d366;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,.2);
+    cursor: pointer; /* Muestra que se puede hacer clic */
+}
+.whatsapp-icon img {
+    width: 30px;
+    height: auto;
+    -webkit-user-drag: none;
+    pointer-events: none;
+}
 
-    .info {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px;
-    }
+/* Estilos para el menú que aparece */
+.whatsapp-menu {
+    position: absolute;
+    bottom: 60px; /* Coloca el menú justo encima del ícono (50px del ícono + 10px de espacio) */
+    left: 0;
+    width: 200px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    padding: 10px 0;
+    /* Ocultar por defecto */
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s, visibility 0.3s;
+}
 
-    .info .date {
-      background: #242525;
-      color: white;
-      padding: 5px 10px;
-      border-radius: 5px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 48%;
-    }
+.whatsapp-menu a {
+    display: block;
+    padding: 8px 15px;
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    white-space: nowrap; /* Evita que el texto se rompa */
+}
 
-    .progress-container {
-      background: #d32f2f;
-      border-radius: 5px;
-      overflow: hidden;
-      height: 32px;
-      width: 47%;
-      position: relative;
-    }
+.whatsapp-menu a:hover {
+    background-color: #f1f1f1;
+    color: #25d366;
+}
 
-    .progress-bar {
-      background: #4caf50;
-      height: 100%;
-      width: 0;
-      transition: width .5s ease;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      position: relative;
-    }
+/* Clase para mostrar el menú (se añade con JavaScript) */
+.whatsapp-container.open .whatsapp-menu {
+    visibility: visible;
+    opacity: 1;
+}
+/* 1. Fuente y Estilo General de la Tabla */
+.table {
+    /* Usamos una fuente más moderna. El navegador usará la primera que encuentre. */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    border-collapse: collapse; /* Bordes más limpios */
+    border-radius: 8px;       /* Bordes redondeados para el contenedor */
+    overflow: hidden;         /* Asegura que el contenido respete los bordes redondeados */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Sombra sutil para darle profundidad */
+}
 
-    .progress-text {
-      position: absolute;
-      width: 100%;
-      color: #000;
-      font-size: 13.8px;
-      text-align: end;
-      pointer-events: none;
-      display: flex;
-      font-weight: bold;
-      padding-left: .3rem;
-    }
+/* 2. Estilo para la Cabecera (thead) */
+.table thead th {
+    background-color: #212529; /* Un negro un poco más intenso para la cabecera */
+    color: #ffffff;
+    font-size: 0.78rem;          /* Tamaño de letra ligeramente más pequeño para cabeceras */
+    font-weight: 600;           /* Letra semi-negrita */
+    text-transform: uppercase;  /* MAYÚSCULAS para un look profesional */
+    letter-spacing: 0.5px;      /* Un poco de espacio entre letras */
+    border-bottom: 2px solid #454d55; /* Una línea inferior más gruesa para separar la cabecera */
+    padding: 15px 10px;         /* Más espacio vertical (padding) */
+}
 
-    .verify {
-      background: rgb(202, 0, 20);
-      /* Rojo Bootstrap */
-      color: #fff;
-      padding: 15px;
-      font-size: 17px;
-      font-weight: bold;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-align: center;
-      width: var(--card-w);
-      margin-bottom: 8px;
-      box-shadow: 0 4px 8px rgba(220, 53, 69, 0.4);
-    }
+/* 3. Estilo para las Celdas del Cuerpo (tbody) */
+.table tbody td {
+    color: #e9ecef;             /* Un blanco ligeramente más suave para no cansar la vista */
+    padding: 12px 10px;        /* Espaciado interno cómodo */
+    vertical-align: middle;    /* Ya lo tienes con Bootstrap, pero lo reforzamos */
+    border: none;              /* Quitamos todos los bordes por defecto */
+    border-top: 1px solid #373b3e; /* Línea horizontal sutil para separar filas */
+}
 
-    .verify:hover {
-      background: rgb(200, 35, 51);
-      transform: scale(1.05);
-      box-shadow: 0 6px 12px rgba(200, 35, 51, 0.5);
-    }
+/* 4. Efecto Hover Mejorado */
+.table tbody tr:hover {
+    background-color: #343a40; /* Un gris oscuro sutil al pasar el mouse */
+    transform: scale(1.02);    /* Aumenta ligeramente el tamaño de la fila */
+    transition: all 0.2s ease-in-out; /* Animación suave para el efecto */
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.4); /* Sombra que aparece en el hover */
+}
 
-    /* Contenedor principal para posicionamiento fijo */
-    .whatsapp-container {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      z-index: 1000;
-      /* Asegura que esté por encima de otros elementos */
-    }
+/* Reseteamos el estilo de la primera fila del body para que no tenga borde superior */
+.table tbody tr:first-child td {
+    border-top: none;
+}
 
-    /* Estilo para el ícono (tu estilo original) */
-    .whatsapp-icon {
-      background: #25d366;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, .2);
-      cursor: pointer;
-      /* Muestra que se puede hacer clic */
-    }
-
-    .whatsapp-icon img {
-      width: 30px;
-      height: auto;
-      -webkit-user-drag: none;
-      pointer-events: none;
-    }
-
-    /* Estilos para el menú que aparece */
-    .whatsapp-menu {
-      position: absolute;
-      bottom: 60px;
-      /* Coloca el menú justo encima del ícono (50px del ícono + 10px de espacio) */
-      left: 0;
-      width: 200px;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-      padding: 10px 0;
-      /* Ocultar por defecto */
-      visibility: hidden;
-      opacity: 0;
-      transition: opacity 0.3s, visibility 0.3s;
-    }
-
-    .whatsapp-menu a {
-      display: block;
-      padding: 8px 15px;
-      text-decoration: none;
-      color: #333;
-      font-size: 14px;
-      white-space: nowrap;
-      /* Evita que el texto se rompa */
-    }
-
-    .whatsapp-menu a:hover {
-      background-color: #f1f1f1;
-      color: #25d366;
-    }
-
-    /* Clase para mostrar el menú (se añade con JavaScript) */
-    .whatsapp-container.open .whatsapp-menu {
-      visibility: visible;
-      opacity: 1;
-    }
-
-    /* 1. Fuente y Estilo General de la Tabla */
-    .table {
-      /* Usamos una fuente más moderna. El navegador usará la primera que encuentre. */
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      border-collapse: collapse;
-      /* Bordes más limpios */
-      border-radius: 8px;
-      /* Bordes redondeados para el contenedor */
-      overflow: hidden;
-      /* Asegura que el contenido respete los bordes redondeados */
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      /* Sombra sutil para darle profundidad */
-    }
-
-    /* 2. Estilo para la Cabecera (thead) */
-    .table thead th {
-      background-color: #212529;
-      /* Un negro un poco más intenso para la cabecera */
-      color: #ffffff;
-      font-size: 0.78rem;
-      /* Tamaño de letra ligeramente más pequeño para cabeceras */
-      font-weight: 600;
-      /* Letra semi-negrita */
-      text-transform: uppercase;
-      /* MAYÚSCULAS para un look profesional */
-      letter-spacing: 0.5px;
-      /* Un poco de espacio entre letras */
-      border-bottom: 2px solid #454d55;
-      /* Una línea inferior más gruesa para separar la cabecera */
-      padding: 15px 10px;
-      /* Más espacio vertical (padding) */
-    }
-
-    /* 3. Estilo para las Celdas del Cuerpo (tbody) */
-    .table tbody td {
-      color: #e9ecef;
-      /* Un blanco ligeramente más suave para no cansar la vista */
-      padding: 12px 10px;
-      /* Espaciado interno cómodo */
-      vertical-align: middle;
-      /* Ya lo tienes con Bootstrap, pero lo reforzamos */
-      border: none;
-      /* Quitamos todos los bordes por defecto */
-      border-top: 1px solid #373b3e;
-      /* Línea horizontal sutil para separar filas */
-    }
-
-    /* 4. Efecto Hover Mejorado */
-    .table tbody tr:hover {
-      background-color: #343a40;
-      /* Un gris oscuro sutil al pasar el mouse */
-      transform: scale(1.02);
-      /* Aumenta ligeramente el tamaño de la fila */
-      transition: all 0.2s ease-in-out;
-      /* Animación suave para el efecto */
-      box-shadow: 0 5px 12px rgba(0, 0, 0, 0.4);
-      /* Sombra que aparece en el hover */
-    }
-
-    /* Reseteamos el estilo de la primera fila del body para que no tenga borde superior */
-    .table tbody tr:first-child td {
-      border-top: none;
-    }
-
-    /* 5. Estilo para las celdas "clickables" */
-    .clickable-cell {
-      cursor: pointer;
-      /* Cambia el cursor a una mano para indicar que se puede hacer clic */
-    }
+/* 5. Estilo para las celdas "clickables" */
+.clickable-cell {
+    cursor: pointer; /* Cambia el cursor a una mano para indicar que se puede hacer clic */
+}
   </style>
 </head>
-
 <body>
-  <script>
+<script>
     document.addEventListener('DOMContentLoaded', () => {
-      const container = document.querySelector('.whatsapp-container');
-      const icon = document.querySelector('.whatsapp-icon');
+    const container = document.querySelector('.whatsapp-container');
+    const icon = document.querySelector('.whatsapp-icon');
 
-      // Muestra/Oculta el menú al hacer clic en el ícono
-      icon.addEventListener('click', () => {
+    // Muestra/Oculta el menú al hacer clic en el ícono
+    icon.addEventListener('click', () => {
         container.classList.toggle('open');
-      });
+    });
 
-      // Cierra el menú si se hace clic fuera de él
-      document.addEventListener('click', (event) => {
+    // Cierra el menú si se hace clic fuera de él
+    document.addEventListener('click', (event) => {
         if (!container.contains(event.target) && container.classList.contains('open')) {
-          container.classList.remove('open');
+            container.classList.remove('open');
         }
-      });
     });
-  </script>
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      let table = document.querySelector(".table tbody");
-      let rows = Array.from(table.querySelectorAll("tr"));
+});
+</script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                let table = document.querySelector(".table tbody");
+                let rows = Array.from(table.querySelectorAll("tr"));
 
-      // Convertir las filas a un array con datos relevantes
-      let data = rows.map(row => {
-        let cantidadCell = row.cells[1]; // La celda de cantidad es la 6ta (índice 5)
-        let cantidad = parseInt(cantidadCell.textContent.trim()) || 0;
-        return { row, cantidad };
-      });
+                // Convertir las filas a un array con datos relevantes
+                let data = rows.map(row => {
+                    let cantidadCell = row.cells[1]; // La celda de cantidad es la 6ta (índice 5)
+                    let cantidad = parseInt(cantidadCell.textContent.trim()) || 0;
+                    return { row, cantidad };
+                });
 
-      // Ordenar de mayor a menor según la cantidad
-      data.sort((a, b) => b.cantidad - a.cantidad);
+                // Ordenar de mayor a menor según la cantidad
+                data.sort((a, b) => b.cantidad - a.cantidad);
 
-      // Tomar solo el top 5
-      let top5 = data.slice(0, 5);
+                // Tomar solo el top 5
+                let top5 = data.slice(0, 5);
 
-      // Agregar una columna de numeración a cada fila del top 5
-      top5.forEach((item, index) => {
-        let numCell = document.createElement("td");
-        numCell.textContent = index + 1; // Enumeración desde 1
-        numCell.classList.add("clickable-cell");
-        item.row.insertBefore(numCell, item.row.firstChild);
-      });
+                // Agregar una columna de numeración a cada fila del top 5
+                top5.forEach((item, index) => {
+                    let numCell = document.createElement("td");
+                    numCell.textContent = index + 1; // Enumeración desde 1
+                    numCell.classList.add("clickable-cell");
+                    item.row.insertBefore(numCell, item.row.firstChild);
+                });
 
-      // Modificar el encabezado para incluir la numeración
-      let thead = document.querySelector(".table thead tr");
-      let numHeader = document.createElement("th");
-      numHeader.textContent = "#"; // Encabezado de numeración
-      thead.insertBefore(numHeader, thead.firstChild);
+                // Modificar el encabezado para incluir la numeración
+                let thead = document.querySelector(".table thead tr");
+                let numHeader = document.createElement("th");
+                numHeader.textContent = "#"; // Encabezado de numeración
+                thead.insertBefore(numHeader, thead.firstChild);
 
-      // Limpiar la tabla y agregar solo el top 5 con la nueva columna
-      table.innerHTML = "";
-      top5.forEach(item => table.appendChild(item.row));
-    });
-  </script>
+                // Limpiar la tabla y agregar solo el top 5 con la nueva columna
+                table.innerHTML = "";
+                top5.forEach(item => table.appendChild(item.row));
+            });
+            </script>
   <div><img class="logo" src="/static/img/icon.png" alt=""></div>
 
-  <div class="table-responsive">
+<div class="table-responsive">
     <table class="table table-hover table-dark align-middle text-center">
-      <thead class="table-dark">
-        <tr>
-          <th>Nombre</th>
-          <th>Tickets</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for solicitud in solicitudes %}
-        <tr>
-          <td class="clickable-cell">{{ solicitud.nombre }}</td>
-          <td class="clickable-cell">{{ solicitud.length }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
+        <thead class="table-dark">
+            <tr>
+                <th>Nombre</th>
+                <th>Tickets</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for solicitud in solicitudes %}
+            <tr>
+                <td class="clickable-cell">{{ solicitud.nombre }}</td>
+                <td class="clickable-cell">{{ solicitud.length }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
-  </div>
+</div>
   <div class="slider-wrapper">
     <div class="slider" id="slider">
       <!-- Principal (funciones 1) -->
       <div class="card" aria-label="Rifa principal">
         <img src="{{ url_for('img_data', filename='partida.jpg') }}" alt="Imagen rifa 1" draggable="false">
         <div class="THIS">{{ premio }}</div>
-        <button class="buy" id="buy-button-1" onclick="buyTickets()">COMPRAR TICKETS 🎫</button>
-        <button class="verify" onclick="verifyTicket()">Verificar Ticket 🎫</button>
+<button class="buy" id="buy-button-1" onclick="buyTickets()">COMPRAR TICKETS 🎫</button>
+<button class="verify" onclick="verifyTicket()">Verificar Ticket 🎫</button>
         <div class="info">
           <div class="date">{{ enunciado }}</div>
           <div class="progress-container">
@@ -442,59 +322,64 @@
         </div>
       </div>
 
+      <!-- Secundaria (funciones 2) -->
+
+
+
+
+
     </div><!-- /slider -->
   </div><!-- /slider-wrapper -->
 
-  <div class="whatsapp-container">
+<div class="whatsapp-container">
     <div class="whatsapp-icon">
-      <img src="static/img/ws.png" alt="WhatsApp" draggable="false">
+        <img src="static/img/ws.png" alt="WhatsApp" draggable="false">
     </div>
 
     <div class="whatsapp-menu">
-      <a href="https://wa.me/+584242867078" target="_blank">Soporte Movistar</a>
-      <a href="https://wa.me/+584123447727" target="_blank">Soporte Digitel</a>
-      <a href="https://wa.me/+584121207844" target="_blank">Soporte Digitel 2</a>
+        <a href="https://wa.me/+584242867078" target="_blank">Soporte Movistar</a>
+        <a href="https://wa.me/+584123447727" target="_blank">Soporte Digitel</a>
+        <a href="https://wa.me/+584121207844" target="_blank">Soporte Digitel 2</a>
     </div>
-  </div>
+</div>
 
   <script>
-    function buyTickets() { window.location.href = '/compra'; }
-    function verifyTicket() { window.location.href = '/verify'; }
-    function verifyTicket2() { window.location.href = '/verify2'; }
-    function verifyTicket3() { window.location.href = '/verify3'; }
+    function buyTickets(){ window.location.href='/compra'; }
+    function verifyTicket(){ window.location.href='/verify'; }
+    function verifyTicket2(){ window.location.href='/verify2'; }
+    function verifyTicket3(){ window.location.href='/verify3'; }
 
     // Progreso por tarjeta
-    function updateProgressBar(suffix, porcentaje) {
-      const bar = document.getElementById(`progress-bar-${suffix}`);
-      const text = document.getElementById(`progress-text-${suffix}`);
-      if (!bar || !text) return; // si no existe la tarjeta, no hacemos nada
-      const pct = parseFloat(porcentaje);
-      if (!isNaN(pct)) { bar.style.width = `${pct}%`; text.textContent = `QUEDAN ${pct}%`; }
-    }
+  function updateProgressBar(suffix, porcentaje){
+    const bar = document.getElementById(`progress-bar-${suffix}`);
+    const text = document.getElementById(`progress-text-${suffix}`);
+    if(!bar || !text) return; // si no existe la tarjeta, no hacemos nada
+    const pct = parseFloat(porcentaje);
+    if(!isNaN(pct)){ bar.style.width = `${pct}%`; text.textContent = `QUEDAN ${pct}%`; }
+  }
 
-    updateProgressBar(1, {{ porcentaje | tojson }});
+  updateProgressBar(1, {{ porcentaje | tojson }});
 
     // Ocultar comprar en principal si no disponible
-    (function () {
+    (function(){
       const enunciado = "{{ enunciado }}".trim();
-      const disponibilidad = {{ disponibilidad }}
-    }
-    if (enunciado === "No disponible" || disponibilidad === 0) {
-      const btn = document.getElementById("buy-button-1");
-      if (btn) btn.style.display = "none";
-    }
-    }) ();
+      const disponibilidad = {{ disponibilidad }};
+      if (enunciado === "No disponible" || disponibilidad === 0) {
+        const btn = document.getElementById("buy-button-1");
+        if (btn) btn.style.display = "none";
+      }
+    })();
 
     // ----- Arrastre con inercia (momentum) y prevención de drag de imágenes -----
-    (function () {
+    (function(){
       const slider = document.getElementById('slider');
       let isDown = false, startX = 0, startLeft = 0;
       let lastX = 0, lastTime = 0, velocity = 0, rafId = null;
 
       // Evita arrastrar imágenes nativas
-      slider.addEventListener('dragstart', e => e.preventDefault(), { passive: false });
+      slider.addEventListener('dragstart', e => e.preventDefault(), {passive:false});
 
-      function onMouseDown(e) {
+      function onMouseDown(e){
         isDown = true;
         startX = e.pageX - slider.offsetLeft;
         startLeft = slider.scrollLeft;
@@ -503,8 +388,8 @@
         velocity = 0;
         if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
       }
-      function onMouseMove(e) {
-        if (!isDown) return;
+      function onMouseMove(e){
+        if(!isDown) return;
         e.preventDefault();
         const x = e.pageX - slider.offsetLeft;
         slider.scrollLeft = startLeft - (x - startX);
@@ -514,15 +399,15 @@
         velocity = (x - lastX) / (now - lastTime);
         lastX = x; lastTime = now;
       }
-      function onMouseUp() {
-        if (!isDown) return;
+      function onMouseUp(){
+        if(!isDown) return;
         isDown = false;
         // Inercia
         let v = velocity * 16; // px/frame aprox (16ms/frame)
         const friction = 0.92; // 0-1 (más bajo = se frena más rápido)
         const minVel = 0.3;    // px/frame
 
-        function momentum() {
+        function momentum(){
           if (Math.abs(v) < minVel) { rafId = null; return; }
           slider.scrollLeft -= v;
           v *= friction;
@@ -534,19 +419,19 @@
 
       slider.addEventListener('mousedown', onMouseDown);
       slider.addEventListener('mousemove', onMouseMove);
-      ['mouseleave', 'mouseup'].forEach(ev => window.addEventListener(ev, onMouseUp));
+      ['mouseleave','mouseup'].forEach(ev => window.addEventListener(ev, onMouseUp));
 
       // ---- Efecto 3D (separado para reusar arriba) ----
       const cards = Array.from(slider.querySelectorAll('.card'));
-      function apply3D() {
+      function apply3D(){
         const rect = slider.getBoundingClientRect();
         const center = rect.width / 2;
-        cards.forEach(card => {
+        cards.forEach(card=>{
           const r = card.getBoundingClientRect();
-          const cardCenter = (r.left - rect.left) + r.width / 2;
+          const cardCenter = (r.left - rect.left) + r.width/2;
           const delta = (cardCenter - center) / rect.width; // -1..1
-          const angle = Math.max(-25, Math.min(25, -delta * 40));
-          const scale = Math.max(0.9, 1 - Math.abs(delta) * 0.08);
+          const angle = Math.max(-25, Math.min(25, -delta*40));
+          const scale = Math.max(0.9, 1 - Math.abs(delta)*0.08);
           card.style.transform = `rotateY(${angle}deg) scale(${scale})`;
           card.style.boxShadow = Math.abs(delta) < 0.15
             ? '0 16px 28px rgba(0,0,0,.45)'
@@ -555,12 +440,11 @@
       }
 
       // Actualizar en scroll/resize/load
-      slider.addEventListener('scroll', apply3D, { passive: true });
-      window.addEventListener('resize', apply3D, { passive: true });
-      window.addEventListener('load', apply3D, { passive: true });
+      slider.addEventListener('scroll', apply3D, {passive:true});
+      window.addEventListener('resize', apply3D, {passive:true});
+      window.addEventListener('load', apply3D, {passive:true});
       apply3D();
     })();
   </script>
 </body>
-
 </html>
