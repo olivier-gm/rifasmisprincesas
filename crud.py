@@ -758,6 +758,22 @@ def get_porcentaje(flag):
     porcentaje = (cantidad / total) * 100
     return round(porcentaje, 2)
 
+def _resumen_disponibilidad(db_path, total=10000):
+    with sqlite3.connect(db_path) as conn:
+        cantidad = conn.execute(
+            "SELECT COUNT(carton_disponible) FROM tickets_disponibles"
+        ).fetchone()[0]
+    return round((cantidad / total) * 100, 2), cantidad
+
+def get_resumen_disponibilidad():
+    return _resumen_disponibilidad(RIFA_DB_PATH)
+
+def get_resumen_disponibilidad2():
+    return _resumen_disponibilidad(RIFA2_DB_PATH)
+
+def get_resumen_disponibilidad3():
+    return _resumen_disponibilidad(RIFA3_DB_PATH)
+
 
 
 def get_estatus():

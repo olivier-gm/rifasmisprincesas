@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash, send_from_directory
 from config import DATA_DIR, UPLOAD_DIR, IMG_DIR, CONFIG_DB_PATH, RIFA_DB_PATH, RIFA2_DB_PATH, RIFA3_DB_PATH
-from crud import set_acepta_dolares, get_acepta_dolares, obtener_datos_historial, obtener_comprador_por_cedula2, obtener_comprador_por_cedula3, get_enunciado2, get_enunciado3, get_porcentaje2, get_porcentaje3, get_premio2, get_premio3, obtener_comprador_por_cedula, get_tickets, get_porcentaje, tickets_disponibles,reintegrar_tickets,get_data, get_data2, actualizar_partida,obtener_datos_partida, get_enunciado, get_premio, insertar_comprador, get_estatus, get_precio, vendidos, get_minima, get_dolar, get_zelle
+from crud import set_acepta_dolares, get_acepta_dolares, obtener_datos_historial, obtener_comprador_por_cedula2, obtener_comprador_por_cedula3, get_enunciado2, get_enunciado3, get_porcentaje2, get_porcentaje3, get_premio2, get_premio3, obtener_comprador_por_cedula, get_tickets, get_porcentaje, tickets_disponibles,reintegrar_tickets,get_data, get_data2, actualizar_partida,obtener_datos_partida, get_enunciado, get_premio, insertar_comprador, get_estatus, get_precio, vendidos, get_minima, get_dolar, get_zelle, get_resumen_disponibilidad, get_resumen_disponibilidad2, get_resumen_disponibilidad3
 import os
 from werkzeug.utils import secure_filename
 from functools import wraps
@@ -227,12 +227,15 @@ def run_dev_cli():
 @app.route('/', methods=["GET"])
 def index():
     flags = obtener_datos_historial()  # solo lee en GET
+    porcentaje, disponibilidad = get_resumen_disponibilidad()
+    porcentaje2, disponibilidad2 = get_resumen_disponibilidad2()
+    porcentaje3, disponibilidad3 = get_resumen_disponibilidad3()
     return render_template(
         'index.html', solicitudes = get_data2(),
         enunciado=get_enunciado(), enunciado2=get_enunciado2(), enunciado3=get_enunciado3(),
         premio=get_premio(), premio2=get_premio2(), premio3=get_premio3(),
-        porcentaje=get_porcentaje(True), porcentaje2=get_porcentaje2(True), porcentaje3=get_porcentaje3(True),
-        disponibilidad=get_porcentaje(False), disponibilidad2=get_porcentaje2(False), disponibilidad3=get_porcentaje3(False),
+        porcentaje=porcentaje, porcentaje2=porcentaje2, porcentaje3=porcentaje3,
+        disponibilidad=disponibilidad, disponibilidad2=disponibilidad2, disponibilidad3=disponibilidad3,
         mostrar_rifa2=bool(flags['mostrar_rifa2']),
         mostrar_rifa3=bool(flags['mostrar_rifa3'])
     )
@@ -251,10 +254,11 @@ def pago():
     if estatus == "Venta finalizada":
         return redirect(url_for('index'))  # redirigir a un panel de administración
     # Si no es POST, solo se muestran los datos vacíos
+    porcentaje, disponibilidad = get_resumen_disponibilidad()
     return render_template("comprar.html", cant_min=get_minima(),
                             precio=int(get_precio()),
                             zelle=get_zelle(), precio_dolares=get_dolar(),
-                            porcentaje=get_porcentaje(True), disponibilidad = get_porcentaje(False),
+                            porcentaje=porcentaje, disponibilidad=disponibilidad,
     acepta_dolares=get_acepta_dolares())
 
 @app.route("/verify", methods=["POST", "GET"])
